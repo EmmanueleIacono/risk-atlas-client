@@ -5,13 +5,20 @@
 <script setup lang="ts">
 import { useCesiumStore } from "../stores/useCesiumStore";
 import { ref, onMounted } from "vue";
-import { Viewer, createWorldTerrainAsync, NearFarScalar, Cartesian3, Math } from "cesium";
+import { Camera, Viewer, createWorldTerrainAsync, NearFarScalar,/* Cartesian3, Math,*/ Rectangle } from "cesium";
 import { useTilesetClamping } from "../composables/useTilesetClamping";
 
-const NL = { // birdseye view over the whole NL
-  lat: 50.356,
-  lon: 5.217,
-  z_from_ellipsoid: 120_000
+// const starting_point = { // birdseye view on start
+//   lat: 43.013,
+//   lon: 9.126,
+//   z_from_ellipsoid: 120_000
+// };
+
+const home_EU = {
+  west: -0.2222,
+  south: 0.63626,
+  east: 0.7169,
+  north: 1.2155
 };
 
 const containerRef = ref<HTMLDivElement | null>(null);
@@ -21,6 +28,10 @@ const { attachClampWhenVisible } = useTilesetClamping();
 
 onMounted(async () => {
   if (containerRef.value) {
+    // home button location settings
+    Camera.DEFAULT_VIEW_RECTANGLE = new Rectangle(home_EU.west, home_EU.south, home_EU.east, home_EU.north);
+
+    // viewer init
     viewerRef.value = new Viewer(
       containerRef.value,
       {
@@ -53,14 +64,14 @@ onMounted(async () => {
       }
     });
 
-    // fly to NL
-    viewerRef.value.camera.flyTo({
-      destination: Cartesian3.fromDegrees(NL.lon, NL.lat, NL.z_from_ellipsoid),
-      orientation: {
-        heading: Math.toRadians(0.0),
-        pitch: Math.toRadians(-35.0),
-      }
-    });
+    // fly to starting point
+    // viewerRef.value.camera.flyTo({
+    //   destination: Cartesian3.fromDegrees(starting_point.lon, starting_point.lat, starting_point.z_from_ellipsoid),
+    //   orientation: {
+    //     heading: Math.toRadians(0.0),
+    //     pitch: Math.toRadians(-35.0),
+    //   }
+    // });
   }
 });
 </script>
