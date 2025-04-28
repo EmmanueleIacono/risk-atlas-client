@@ -1,21 +1,26 @@
+type NavbarItem = {
+  name: string;
+};
+
 type ProjectInfo = {
-    project_id: string;
-    project_description: string | null;
+  project_id: string;
+  project_description: string | null;
 };
 
 type IfcClassesInfo = {
-    project_id: string;
-    ifc_classes: string[];
+  project_id: string;
+  ifc_classes: string[];
 };
 
 type TilesetLocationInfo = {
-    tileset_id: string,
-    longitude: number,
-    latitude: number
+  tileset_id: string,
+  longitude: number,
+  latitude: number
 };
 
 export {
-    ProjectInfo,
-    IfcClassesInfo,
-    TilesetLocationInfo
+  NavbarItem,
+  ProjectInfo,
+  IfcClassesInfo,
+  TilesetLocationInfo
 }

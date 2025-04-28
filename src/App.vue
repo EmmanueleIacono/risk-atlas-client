@@ -1,16 +1,38 @@
 <template>
-  <CesiumViewer />
-  <MenuContainer />
-  <MetadataTooltip />
+  <TopNavbar
+    :menu_items="menu_items"
+    class="top-navbar"
+  />
+  <div class="page-content">
+    <CesiumViewer />
+    <MenuContainer />
+    <MetadataTooltip />
+  </div>
 </template>
 
 <script setup lang="ts">
+import { NavbarItem } from "./types/types";
+import TopNavbar from "./components/TopNavbar.vue";
 import CesiumViewer from "./components/CesiumViewer.vue";
 import MenuContainer from "./components/MenuContainer.vue";
 import MetadataTooltip from "./components/MetadataTooltip.vue";
+
+const menu_items: NavbarItem[] = [
+  {name: "GIS Data"},
+  {name: "BIM Data"},
+  {name: "Real-Time Data"},
+];
 </script>
 
 <style>
+:root {
+  --RA-dark-gray: #333333;
+  --RA-light-gray: #4e4e4e;
+  --RA-superlight-gray: #7e7e7e;
+  --RA-deep-teal: #007b83;
+  --RA-aqua-accent: #00c6b3;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -22,6 +44,18 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+}
+
+.top-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.page-content {
+  padding-top: 3rem;
 }
 
 hr {

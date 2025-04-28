@@ -48,7 +48,7 @@ async function getAvailableIfcClasses() {
 <style scoped>
 .menu-container {
   position: absolute;
-  top: 10px;
+  top: calc(3rem + 10px);
   left: 10px;
   z-index: 1000; /* Ensure the menu appears above the Cesium viewer */
   background-color: rgba(0, 0, 0, 0.5); /* Grey transparent background */

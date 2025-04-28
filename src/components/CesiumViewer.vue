@@ -79,7 +79,7 @@ onMounted(async () => {
 <style scoped>
 .cesium-container {
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 3rem);
   margin: 0;
   padding: 0;
 }
