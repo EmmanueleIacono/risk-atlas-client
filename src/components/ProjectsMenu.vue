@@ -4,8 +4,8 @@
       <summary class="menu-summary">Projects</summary>
       <div class="options-container">
         <div v-for="proj in availableProjectsMapRef.values()">
-          <input class="menu-input" type="checkbox" v-model="selectedProjectsRef" :id="`cbx-${proj.project_id}`" :value="proj.project_id">
-          <label class="menu-input" :for="`cbx-${proj.project_id}`">{{ proj.project_description ? proj.project_description : proj.project_id }}</label>
+          <input class="menu-input-cbx" type="checkbox" v-model="selectedProjectsRef" :id="`cbx-${proj.project_id}`" :value="proj.project_id">
+          <label class="menu-input-cbx" :for="`cbx-${proj.project_id}`">{{ proj.project_description ? proj.project_description : proj.project_id }}</label>
         </div>
       </div>
     </details>
@@ -15,14 +15,14 @@
       <div class="options-container">
         <div v-for="ifc_class in availableIfcClassesList">
           <input
-            class="menu-input"
+            class="menu-input-cbx"
             v-model="selectedIfcClassesRef"
             type="checkbox"
             :id="`cbx-${ifc_class}`"
             :value="ifc_class"
             :disabled="!applicableIfcClasses.has(ifc_class)"
           >
-          <label :class="`menu-input${applicableIfcClasses.has(ifc_class) ? '' : ' not-applicable'}`" :for="`cbx-${ifc_class}`">{{ifc_class}}</label>
+          <label :class="`menu-input-cbx${applicableIfcClasses.has(ifc_class) ? '' : ' not-applicable'}`" :for="`cbx-${ifc_class}`">{{ifc_class}}</label>
         </div>
       </div>
     </details>

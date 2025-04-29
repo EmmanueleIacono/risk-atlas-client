@@ -1,10 +1,24 @@
 <template>
   <div class="menu-container">
-    <FlyToMenu />
-    <hr>
-    <ProjectsMenu />
-    <hr>
-    <button class="menu-button" @click="removeAllTilesets"><b>Reset Viewer</b></button>
+    <div v-show="activeMenuRef === 'gis'">
+      <i>GIS Data Menu here</i>
+      <hr>
+    </div>
+    <div v-show="activeMenuRef === 'bim'">
+      <FlyToMenu />
+      <hr>
+      <ProjectsMenu />
+      <hr>
+    </div>
+    <div v-show="activeMenuRef === 'iot'">
+      <i>Real-Time Data Menu here</i>
+      <hr>
+    </div>
+    <div v-show="activeMenuRef === 'dash'">
+      <i>Dashboard Menu here</i>
+      <hr>
+    </div>
+    <button class="menu-button" @click="resetViewer"><b>Reset Viewer</b></button>
   </div>
 </template>
 
@@ -13,12 +27,14 @@ import { onMounted } from "vue";
 import { ProjectInfo, IfcClassesInfo } from "../types/types";
 import { useServerStore } from "../stores/useServerStore";
 import { useCesiumStore } from "../stores/useCesiumStore";
+import { useNavbarStore } from "../stores/useNavbarStore";
 import { useTilesetAddRemove } from "../composables/useTilesetAddRemove";
 import FlyToMenu from "./FlyToMenu.vue";
 import ProjectsMenu from "./ProjectsMenu.vue";
 
 const { buildProjectsUrl, buildClassesUrl } = useServerStore();
 const { availableProjectsMapRef, availableIfcClassesRef } = useCesiumStore();
+const { activeMenuRef } = useNavbarStore();
 const { removeAllTilesets } = useTilesetAddRemove();
 
 onMounted(async () => {
@@ -43,6 +59,10 @@ async function getAvailableIfcClasses() {
   const classes = await resp.json();
   return classes;
 }
+
+function resetViewer() {
+  removeAllTilesets();
+}
 </script>
 
 <style scoped>
@@ -54,9 +74,13 @@ async function getAvailableIfcClasses() {
   background-color: rgba(0, 0, 0, 0.5); /* Grey transparent background */
   padding: 10px; /* Add padding for spacing */
   border-radius: 5px; /* Add border radius for rounded corners */
-  max-height: 90vh;
+  max-height: calc(90vh - 3rem);
   overflow: auto;
   scrollbar-width: thin;
   scrollbar-color: #2f2f2f #464646;
+}
+
+i {
+  color: #666;
 }
 </style>

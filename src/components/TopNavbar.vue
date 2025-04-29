@@ -1,10 +1,10 @@
 <template>
-  <nav class="top-navbar">
+  <nav class="top-navbar" @click="esc($event)">
     <!-- Logo -->
     <img src="../assets/img/RA_logo_v3.png" alt="RiskAtlas" class="logo">
     <!-- Buttons -->
     <ul class="navbar-menu">
-      <li v-for="item in menu_items" :key="item.name" class="menu-item">{{ item.name }}</li>
+      <li v-for="item in menu_items" :key="item.id" class="menu-item" :class="{selected: activeMenuRef === item.id}" @click="updateActiveMenuRef(item.id)">{{ item.name }}</li>
     </ul>
     <!-- Login Button -->
     <button class="login-btn">Login</button>
@@ -13,18 +13,28 @@
 
 <script setup lang="ts">
 import { NavbarItem } from "../types/types";
+import { useNavbarStore } from "../stores/useNavbarStore";
+
+const { activeMenuRef, updateActiveMenuRef } = useNavbarStore();
+
 const props = defineProps<{
   menu_items: NavbarItem[];
 }>();
+
+function esc(evt: any) {
+  if (!evt.target?.classList.contains('menu-item')) {
+    updateActiveMenuRef(null);
+  }
+}
 </script>
 
 <style scoped>
 .top-navbar {
   display: flex;
   align-items: center;
-  padding: .5rem 1rem;
+  padding: 0 1rem;
+  height: 3rem;
   background: var(--RA-dark-gray);
-  box-shadow: 0 1px 2px rgb(0 0 0 / .08);
 }
 
 .logo {
@@ -48,13 +58,17 @@ const props = defineProps<{
   color: #fff;
   text-decoration: none;
   font-weight: bold;
-  padding: .5rem 1rem;
+  padding: 1rem 1rem;
   user-select: none;
 }
 
 .menu-item:hover {
   cursor: pointer;
   background-color: var(--RA-light-gray);
+}
+
+.menu-item.selected {
+  color: var(--RA-aqua-accent);
 }
 
 .login-btn {

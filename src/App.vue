@@ -18,10 +18,10 @@ import MenuContainer from "./components/MenuContainer.vue";
 import MetadataTooltip from "./components/MetadataTooltip.vue";
 
 const menu_items: NavbarItem[] = [
-  {name: "GIS Data"},
-  {name: "BIM Data"},
-  {name: "Real-Time Data"},
-  {name: "Dashboard"},
+  {id: "gis", name: "GIS Data"},
+  {id: "bim", name: "BIM Data"},
+  {id: "iot", name: "Real-Time Data"},
+  {id: "dash", name: "Dashboard"},
 ];
 </script>
 
@@ -87,9 +87,9 @@ hr {
   scrollbar-color: #2f2f2f #464646;
 }
 
-.menu-input {
+.menu-input-cbx {
   margin: 10px 0;
-  accent-color: #000;
+  accent-color: var(--RA-aqua-accent);
 }
 
 .menu-button {
@@ -116,7 +116,7 @@ hr {
   background-color: #333;
 }
 
-.menu-button, .menu-summary, .menu-input {
+.menu-button, .menu-summary, .menu-input-cbx {
   margin-bottom: 5px;
   padding: 5px 10px;
   color: #fff;
@@ -126,7 +126,7 @@ hr {
   text-align: left;
 }
 
-.menu-input:disabled {
+.menu-input-cbx:disabled {
   cursor: not-allowed;
 }
 </style>
