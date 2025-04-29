@@ -21,6 +21,7 @@ const menu_items: NavbarItem[] = [
   {name: "GIS Data"},
   {name: "BIM Data"},
   {name: "Real-Time Data"},
+  {name: "Dashboard"},
 ];
 </script>
 
