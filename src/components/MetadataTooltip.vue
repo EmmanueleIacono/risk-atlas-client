@@ -52,11 +52,14 @@ function createMetadataHtml(title: string, metadata: any) {
 function onMouseMove(movement: any) {
   if (!viewerRef.value) return;
 
+  const canvas_rect = viewerRef.value.scene.canvas.getBoundingClientRect(); // canvas space
+  const local = movement.endPosition;
+
   previousPickedTiles.value.forEach(p => {
     p.content._tile.color = undefined;
   });
 
-  const picked = viewerRef.value.scene.pick(movement.endPosition);
+  const picked = viewerRef.value.scene.pick(local);
   if (!picked || !picked.content) { // nothing picked? hide the tooltip
     visible.value = false;
     return;
@@ -71,8 +74,8 @@ function onMouseMove(movement: any) {
   }
 
   // update tooltip position/content
-  x.value = movement.endPosition.x;
-  y.value = movement.endPosition.y;
+  x.value = local.x + canvas_rect.left;
+  y.value = local.y + canvas_rect.top;
   tooltipHtml.value = text;
   visible.value = !!text; // visible if there IS text to show
 
