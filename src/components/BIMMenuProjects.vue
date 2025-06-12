@@ -1,7 +1,7 @@
 <template>
-  <div class="proj-menu-container">
+  <div class="domain-menu-container">
     <details class="menu-details" open>
-      <summary class="menu-summary">Projects</summary>
+      <summary class="menu-summary">Available Projects</summary>
       <div class="options-container">
         <div v-for="proj in availableProjectsMapRef.values()">
           <input class="menu-input-cbx" type="checkbox" v-model="selectedProjectsRef" :id="`cbx-${proj.project_id}`" :value="proj.project_id">

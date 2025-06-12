@@ -1,8 +1,14 @@
-import {computed, ref} from "vue";
+import {computed, ref, watch} from "vue";
 import type {Viewer, Cesium3DTileset} from "cesium";
-import { ProjectInfo, IfcClassesInfo, TilesetLocationInfo } from "../types/types";
+import { ProjectInfo, ViewerBbox, IfcClassesInfo, TilesetLocationInfo } from "../types/types";
 
 const viewerRef = ref<Viewer | null>(null);
+const currentViewerBboxRef = ref<ViewerBbox>({
+  south: 0.0,
+  west: 0.0,
+  north: 0.0,
+  east: 0.0
+});
 
 const availableProjectsMapRef = ref<Map<string, ProjectInfo>>(new Map());
 const availableIfcClassesRef = ref<IfcClassesInfo[]>([]);
@@ -27,6 +33,7 @@ const availableIfcClassesList = computed(() => {
 export function useCesiumStore() {
   return {
     viewerRef,
+    currentViewerBboxRef,
     availableProjectsMapRef,
     availableIfcClassesRef,
     tilesetsMapRef,

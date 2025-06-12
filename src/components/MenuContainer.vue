@@ -1,13 +1,13 @@
 <template>
   <div class="menu-container">
     <div v-show="activeMenuRef === 'gis'">
-      <i>GIS Data Menu here</i>
+      <GISMenu />
       <hr>
     </div>
     <div v-show="activeMenuRef === 'bim'">
-      <FlyToMenu />
+      <BIMMenuFlyTo />
       <hr>
-      <ProjectsMenu />
+      <BIMMenuProjects />
       <hr>
     </div>
     <div v-show="activeMenuRef === 'iot'">
@@ -28,13 +28,16 @@ import { ProjectInfo, IfcClassesInfo } from "../types/types";
 import { useServerStore } from "../stores/useServerStore";
 import { useCesiumStore } from "../stores/useCesiumStore";
 import { useNavbarStore } from "../stores/useNavbarStore";
+import { useOSMAddRemove } from "../composables/useOSMAddRemove";
 import { useTilesetAddRemove } from "../composables/useTilesetAddRemove";
-import FlyToMenu from "./FlyToMenu.vue";
-import ProjectsMenu from "./ProjectsMenu.vue";
+import BIMMenuFlyTo from "./BIMMenuFlyTo.vue";
+import BIMMenuProjects from "./BIMMenuProjects.vue";
+import GISMenu from "./GISMenu.vue";
 
 const { buildProjectsUrl, buildClassesUrl } = useServerStore();
 const { availableProjectsMapRef, availableIfcClassesRef } = useCesiumStore();
 const { activeMenuRef } = useNavbarStore();
+const { removeOSMBuildings } = useOSMAddRemove();
 const { removeAllTilesets } = useTilesetAddRemove();
 
 onMounted(async () => {
@@ -61,6 +64,7 @@ async function getAvailableIfcClasses() {
 }
 
 function resetViewer() {
+  removeOSMBuildings();
   removeAllTilesets();
 }
 </script>

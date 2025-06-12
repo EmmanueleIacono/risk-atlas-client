@@ -1,6 +1,20 @@
+import type { Feature } from "flatgeobuf";
+
 type NavbarItem = {
   id: string;
   name: string;
+};
+
+type ViewerBbox = {
+  south: number;
+  west: number;
+  north: number;
+  east: number;
+};
+
+type GeoJSONFeatureCollection = {
+  type: string;
+  features: Feature[];
 };
 
 type ProjectInfo = {
@@ -21,6 +35,8 @@ type TilesetLocationInfo = {
 
 export {
   NavbarItem,
+  ViewerBbox,
+  GeoJSONFeatureCollection,
   ProjectInfo,
   IfcClassesInfo,
   TilesetLocationInfo

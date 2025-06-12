@@ -5,14 +5,9 @@
 <script setup lang="ts">
 import { useCesiumStore } from "../stores/useCesiumStore";
 import { ref, onMounted } from "vue";
-import { Camera, Viewer, createWorldTerrainAsync, NearFarScalar,/* Cartesian3, Math,*/ Rectangle } from "cesium";
+import { Camera, Viewer, createWorldTerrainAsync, NearFarScalar, Rectangle } from "cesium";
+import { useCesiumUtils } from "../composables/useCesiumUtils";
 import { useTilesetClamping } from "../composables/useTilesetClamping";
-
-// const starting_point = { // birdseye view on start
-//   lat: 43.013,
-//   lon: 9.126,
-//   z_from_ellipsoid: 120_000
-// };
 
 const home_EU = {
   west: -0.2222,
@@ -24,6 +19,7 @@ const home_EU = {
 const containerRef = ref<HTMLDivElement | null>(null);
 
 const { viewerRef, tilesetsMapRef } = useCesiumStore();
+const { updateCurrentBbox } = useCesiumUtils();
 const { attachClampWhenVisible } = useTilesetClamping();
 
 onMounted(async () => {
@@ -64,16 +60,14 @@ onMounted(async () => {
       }
     });
 
-    // fly to starting point
-    // viewerRef.value.camera.flyTo({
-    //   destination: Cartesian3.fromDegrees(starting_point.lon, starting_point.lat, starting_point.z_from_ellipsoid),
-    //   orientation: {
-    //     heading: Math.toRadians(0.0),
-    //     pitch: Math.toRadians(-35.0),
-    //   }
-    // });
+    viewerRef.value.camera.moveEnd.addEventListener(onCameraMoveEnd);
+
   }
 });
+
+function onCameraMoveEnd() {
+  updateCurrentBbox();
+}
 </script>
 
 <style scoped>

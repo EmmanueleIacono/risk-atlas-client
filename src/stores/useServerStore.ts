@@ -15,10 +15,15 @@ function buildTilesetUrl(project_id: string) {
   return `${server_root}/tilesets/${clean_project_id}`;
 }
 
+function buildOSMBuildingsUrl() {
+  return `${server_root}/geospatial/fgb/osm/buildings`;
+}
+
 export function useServerStore() {
   return {
     buildProjectsUrl,
     buildClassesUrl,
-    buildTilesetUrl
+    buildTilesetUrl,
+    buildOSMBuildingsUrl
   };
 }

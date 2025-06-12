@@ -1,4 +1,5 @@
 <template>
+  <GlobalLoader v-if="loading" />
   <TopNavbar
     :menu_items="menu_items"
     class="top-navbar"
@@ -11,11 +12,15 @@
 </template>
 
 <script setup lang="ts">
+import { useGlobalStore } from "./stores/useGlobalStore";
 import { NavbarItem } from "./types/types";
+import GlobalLoader from "./components/GlobalLoader.vue";
 import TopNavbar from "./components/TopNavbar.vue";
 import CesiumViewer from "./components/CesiumViewer.vue";
 import MenuContainer from "./components/MenuContainer.vue";
 import MetadataTooltip from "./components/MetadataTooltip.vue";
+
+const { loading } = useGlobalStore();
 
 const menu_items: NavbarItem[] = [
   {id: "gis", name: "GIS Data"},
@@ -67,7 +72,7 @@ hr {
   color: #464646;
 }
 
-.proj-menu-container {
+.domain-menu-container {
   margin: 15px 0 10px;
 }
 

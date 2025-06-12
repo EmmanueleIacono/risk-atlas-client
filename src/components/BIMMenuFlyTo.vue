@@ -1,5 +1,5 @@
 <template>
-  <div class="proj-menu-container">
+  <div class="domain-menu-container">
     <details class="menu-details">
       <summary class="menu-summary">Fly to</summary>
       <div v-if="tilesetsMapRef.size > 0" class="options-container">

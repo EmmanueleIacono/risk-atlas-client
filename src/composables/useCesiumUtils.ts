@@ -1,7 +1,7 @@
-import { Cesium3DTileset, Cartographic, Matrix4, Cartesian4, Cartesian3, Rectangle } from "cesium";
+import { Cesium3DTileset, Cartographic, Matrix4, Cartesian4, Cartesian3, Rectangle, Math as CsmMath } from "cesium";
 import { useCesiumStore } from "../stores/useCesiumStore";
 
-const { viewerRef } = useCesiumStore();
+const { viewerRef, currentViewerBboxRef } = useCesiumStore();
 
 function cleanProjectId(raw_project_id: string): string {
   const clean_tileset_id: string = raw_project_id.includes("?filters=") ? raw_project_id.split("?filters=")[0] : raw_project_id;
@@ -49,11 +49,24 @@ function flyToTileset(tileset: Cesium3DTileset | undefined) {
   });
 }
 
+function updateCurrentBbox() {
+  if (!viewerRef.value) return;
+
+  const rect = viewerRef.value.camera.computeViewRectangle();
+  if (!rect) return;
+
+  currentViewerBboxRef.value.south = CsmMath.toDegrees(rect.south);
+  currentViewerBboxRef.value.west = CsmMath.toDegrees(rect.west);
+  currentViewerBboxRef.value.north = CsmMath.toDegrees(rect.north);
+  currentViewerBboxRef.value.east = CsmMath.toDegrees(rect.east);
+}
+
 export function useCesiumUtils() {
   return {
     cleanProjectId,
     extractTilesetBaseLocation,
     createRectangleFromPoint,
-    flyToTileset
+    flyToTileset,
+    updateCurrentBbox
   };
 }
