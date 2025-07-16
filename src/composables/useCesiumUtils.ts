@@ -1,4 +1,4 @@
-import { Cesium3DTileset, Cartographic, Matrix4, Cartesian4, Cartesian3, Rectangle, Math as CsmMath } from "cesium";
+import { Cesium3DTileset, Cartographic, Matrix4, Cartesian4, Cartesian3, Rectangle, Math as CsmMath, type Color, PolygonGraphics, Entity } from "cesium";
 import { useCesiumStore } from "../stores/useCesiumStore";
 
 const { viewerRef, currentViewerBboxRef } = useCesiumStore();
@@ -61,12 +61,58 @@ function updateCurrentBbox() {
   currentViewerBboxRef.value.east = CsmMath.toDegrees(rect.east);
 }
 
+function colorDataSourceEntityById(
+  dataSourceName: string,
+  id: string | number,
+  materialColor: Color | undefined = undefined,
+  outlineColor: Color | undefined = undefined
+) {
+  if (!viewerRef.value) return;
+
+  if (typeof id === 'number') id = id.toString();
+
+  const dataSource = viewerRef.value.dataSources.getByName(dataSourceName)[0];
+  const entity = dataSource.entities.getById(id);
+
+  if (!entity || !entity.polygon) return;
+
+  // dummy prop container
+  const propContainer = new PolygonGraphics({
+    material: materialColor,
+    outlineColor: outlineColor,
+  });
+
+  if (materialColor) entity.polygon.material = propContainer.material;
+  if (outlineColor) entity.polygon.outlineColor = propContainer.outlineColor;
+}
+
+function colorDataSourceEntity(
+  entity: Entity,
+  materialColor: Color | undefined = undefined,
+  outlineColor: Color | undefined = undefined
+) {
+  if (!viewerRef.value) return;
+
+  if (!entity || !entity.polygon) return;
+
+  // dummy prop container
+  const propContainer = new PolygonGraphics({
+    material: materialColor,
+    outlineColor: outlineColor,
+  });
+
+  if (materialColor) entity.polygon.material = propContainer.material;
+  if (outlineColor) entity.polygon.outlineColor = propContainer.outlineColor;
+}
+
 export function useCesiumUtils() {
   return {
     cleanProjectId,
     extractTilesetBaseLocation,
     createRectangleFromPoint,
     flyToTileset,
-    updateCurrentBbox
+    updateCurrentBbox,
+    colorDataSourceEntityById,
+    colorDataSourceEntity,
   };
 }

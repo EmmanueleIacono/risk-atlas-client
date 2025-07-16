@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import { useCesiumStore } from "../stores/useCesiumStore";
 import { ref, onMounted } from "vue";
-import { Camera, Viewer, createWorldTerrainAsync, NearFarScalar, Rectangle } from "cesium";
+import { Camera, Viewer, createWorldTerrainAsync, NearFarScalar, Rectangle, InfoBox } from "cesium";
 import { useCesiumUtils } from "../composables/useCesiumUtils";
 import { useTilesetClamping } from "../composables/useTilesetClamping";
 
@@ -37,6 +37,7 @@ onMounted(async () => {
         baseLayerPicker: true, // base map image layers
         navigationHelpButton: true, // the "?" button
         navigationInstructionsInitiallyVisible: false, // if true, it opens at first launch
+        selectionIndicator: false, // the green "target" that appears over an item when clicking on it
         infoBox: true, // the "property panel" that shows up when clicking on an item
         animation: false, // bottom-left animation widget
         timeline: false, // bottom timeline widget
@@ -61,7 +62,6 @@ onMounted(async () => {
     });
 
     viewerRef.value.camera.moveEnd.addEventListener(onCameraMoveEnd);
-
   }
 });
 

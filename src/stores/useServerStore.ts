@@ -19,11 +19,16 @@ function buildOSMBuildingsUrl() {
   return `${server_root}/geospatial/fgb/osm/buildings`;
 }
 
+function buildFloodHazardUrl() {
+  return `${server_root}/risk-scores/hazards/flood`;
+}
+
 export function useServerStore() {
   return {
     buildProjectsUrl,
     buildClassesUrl,
     buildTilesetUrl,
-    buildOSMBuildingsUrl
+    buildOSMBuildingsUrl,
+    buildFloodHazardUrl,
   };
 }

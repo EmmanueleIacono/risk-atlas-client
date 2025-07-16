@@ -17,6 +17,11 @@ type GeoJSONFeatureCollection = {
   features: Feature[];
 };
 
+type DataSourceEntityData = {
+  id: string;
+  data_source_name: string;
+};
+
 type ProjectInfo = {
   project_id: string;
   project_description: string | null;
@@ -33,11 +38,19 @@ type TilesetLocationInfo = {
   latitude: number
 };
 
+type PointLocationInfo = {
+  id: number,
+  lon: number,
+  lat: number
+};
+
 export {
   NavbarItem,
   ViewerBbox,
   GeoJSONFeatureCollection,
+  DataSourceEntityData,
   ProjectInfo,
   IfcClassesInfo,
-  TilesetLocationInfo
+  TilesetLocationInfo,
+  PointLocationInfo,
 }

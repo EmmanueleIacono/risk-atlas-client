@@ -1,6 +1,6 @@
 import {computed, ref, watch} from "vue";
 import type {Viewer, Cesium3DTileset} from "cesium";
-import { ProjectInfo, ViewerBbox, IfcClassesInfo, TilesetLocationInfo } from "../types/types";
+import { ProjectInfo, ViewerBbox, IfcClassesInfo, TilesetLocationInfo, DataSourceEntityData } from "../types/types";
 
 const viewerRef = ref<Viewer | null>(null);
 const currentViewerBboxRef = ref<ViewerBbox>({
@@ -30,6 +30,8 @@ const availableIfcClassesList = computed(() => {
   return merged_flat_list;
 });
 
+const selectedDataSourceEntityRef = ref<DataSourceEntityData | null>(null);
+
 export function useCesiumStore() {
   return {
     viewerRef,
@@ -38,6 +40,7 @@ export function useCesiumStore() {
     availableIfcClassesRef,
     tilesetsMapRef,
     tilesetsLocationsMapRef,
-    availableIfcClassesList
+    availableIfcClassesList,
+    selectedDataSourceEntityRef,
   };
 }

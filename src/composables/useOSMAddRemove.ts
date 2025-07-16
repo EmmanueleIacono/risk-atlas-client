@@ -1,12 +1,14 @@
-import { Cartographic, GeoJsonDataSource, PolygonGraphics, Color } from "cesium";
-import { GeoJSONFeatureCollection } from "../types/types";
+import { Cartographic, GeoJsonDataSource, PolygonGraphics, HeightReference, PolygonHierarchy, Math as CsmMath } from "cesium";
+import { GeoJSONFeatureCollection, PointLocationInfo } from "../types/types";
+import { useGlobalStore } from "../stores/useGlobalStore";
 import { useServerStore } from "../stores/useServerStore";
 import { useCesiumStore } from "../stores/useCesiumStore";
 import { useGISDataStore } from "../stores/useGISDataStore";
 import { useFlatGeoBufAsGeoJSON } from "./useFlatGeobufAsGeoJSON";
 
+const { defaultMaterialCesiumColor, defaultOutlineCesiumColor } = useGlobalStore();
 const { buildOSMBuildingsUrl } = useServerStore();
-const { viewerRef, currentViewerBboxRef } = useCesiumStore();
+const { viewerRef, currentViewerBboxRef, selectedDataSourceEntityRef } = useCesiumStore();
 const { MAX_OSM_FETCH_HEIGHT, lastBboxStrRef, OSMBuildingsDsRef } = useGISDataStore();
 const { fetchFgbAsGeoJSON } = useFlatGeoBufAsGeoJSON();
 
@@ -66,6 +68,7 @@ function removeOSMBuildings() {
   if (OSMBuildingsDsRef.value) {
     viewerRef.value.dataSources.remove(OSMBuildingsDsRef.value);
     OSMBuildingsDsRef.value = null;
+    selectedDataSourceEntityRef.value = null;
   }
 }
 
@@ -89,34 +92,60 @@ function extrudeOSMBuildings() {
       else {
         extrusion = 4; // default to 4m
       }
-      console.log(`ent n. ${idx} height:\n`, ent.polygon.height);
-      console.log(`ent n. ${idx} heightReference:\n`, ent.polygon.heightReference);
-      console.log(`ent n. ${idx} extrudedHeightReference:\n`, ent.polygon.extrudedHeightReference);
-  
+
       // workaround for clean TypeScript
       // a) creating dummy object
       const propContainer = new PolygonGraphics({
         extrudedHeight: extrusion,
-        material: Color.fromBytes(180, 180, 180, 255),
+        heightReference: HeightReference.CLAMP_TO_TERRAIN,
+        material: defaultMaterialCesiumColor,
         outline: true,
-        outlineColor: Color.fromBytes(128, 128, 128, 255),
+        outlineColor: defaultOutlineCesiumColor,
       });
 
-      // b) extracting dummy object properties (with "Property" type)
-      const contExtH = propContainer.extrudedHeight;
-      const contMat = propContainer.material;
-      const contOutl = propContainer.outline;
-      const contOutlCol = propContainer.outlineColor;
-
-      // c) assigning "Proper" property objects to entity
-      ent.polygon.extrudedHeight = contExtH;
-      ent.polygon.material = contMat;
-      ent.polygon.outline = contOutl;
-      ent.polygon.outlineColor = contOutlCol;
+      // b) assigning "proper" property objects (with "Property" type) to entity, from the dummy object
+      ent.polygon.extrudedHeight = propContainer.extrudedHeight;
+      ent.polygon.heightReference = propContainer.heightReference;
+      ent.polygon.material = propContainer.material;
+      ent.polygon.outline = propContainer.outline;
+      ent.polygon.outlineColor = propContainer.outlineColor;
     } catch (er) {
       console.error('Error extruding building:', er);
     }
   });
+}
+
+function collectOSMPositions() {
+  if (!viewerRef.value) return;
+
+  const osmDataSource = viewerRef.value.dataSources.getByName('osm-geojson')[0];
+  const entities = osmDataSource.entities.values;
+  const entityPositions = entities.map(ent => {
+    if (!ent.polygon) return;
+
+    const hierarchy = ent.polygon.hierarchy?.getValue(viewerRef.value?.clock.currentTime);
+    let coords: PointLocationInfo[] = [];
+    if (hierarchy instanceof PolygonHierarchy) {
+      const PolygonHierarchy = hierarchy as PolygonHierarchy;
+      // POSITIONS are the Cartesian3 coords of each outside-ring point
+      // HOLES are the Cartesian3 coords of each inside-ring point
+      const position = PolygonHierarchy.positions;
+      coords = position.map((cart, idx): PointLocationInfo => {
+        const c = Cartographic.fromCartesian(cart);
+        return {
+          id: idx,
+          lon: CsmMath.toDegrees(c.longitude),
+          lat: CsmMath.toDegrees(c.latitude),
+        };
+      });
+    }
+    return {
+      entity: ent,
+      coordinates: coords,
+    };
+  });
+
+  return entityPositions;
 }
 
 export function useOSMAddRemove() {
@@ -125,5 +154,6 @@ export function useOSMAddRemove() {
     addOSMBuildings,
     removeOSMBuildings,
     extrudeOSMBuildings,
+    collectOSMPositions,
   };
 }

@@ -5,10 +5,15 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, CSSProperties } from "vue";
-import { Color, defined, ScreenSpaceEventHandler, ScreenSpaceEventType } from "cesium";
+import { Color, DataSource, defined, Entity, GeoJsonDataSource, PolygonHierarchy, ScreenSpaceEventHandler, ScreenSpaceEventType } from "cesium";
+import { DataSourceEntityData } from "../types/types";
+import { useGlobalStore } from "../stores/useGlobalStore";
 import { useCesiumStore } from "../stores/useCesiumStore";
+import { useCesiumUtils } from "../composables/useCesiumUtils";
 
-const {viewerRef} = useCesiumStore();
+const { defaultMaterialCesiumColor, defaultOutlineCesiumColor, deepTealCesiumColor, aquaAccentCesiumColor } = useGlobalStore();
+const { viewerRef, selectedDataSourceEntityRef } = useCesiumStore();
+const { colorDataSourceEntityById } = useCesiumUtils();
 
 const x = ref<number>(0);
 const y = ref<number>(0);
@@ -88,7 +93,62 @@ function onLeftClick(movement: any) {
   if (!viewerRef.value) return;
 
   const pickedObject = viewerRef.value.scene.pick(movement.position);
-  console.log("Picked object:", pickedObject);
+  if (!pickedObject) { // no selection? default-color previous selection and remove it from ref
+    if (selectedDataSourceEntityRef.value) {
+      colorDataSourceEntityById(
+        selectedDataSourceEntityRef.value.data_source_name,
+        selectedDataSourceEntityRef.value.id,
+        defaultMaterialCesiumColor,
+        defaultOutlineCesiumColor
+      );
+      selectedDataSourceEntityRef.value = null;
+    }
+  } else { // something is selected? proceed
+    console.log("Picked object:", pickedObject);
+
+    if (pickedObject.id && pickedObject.id instanceof Entity) {
+      const entity = pickedObject.id as Entity;
+      const entityId = entity.id;
+      const entityCollection = entity.entityCollection;
+      const entityCollectionOwner = entityCollection.owner;
+      if (entityCollectionOwner instanceof DataSource || entityCollectionOwner instanceof GeoJsonDataSource) {
+        const owner = entityCollectionOwner as DataSource;
+        const entityCollectionName = owner.name;
+
+        const entityData: DataSourceEntityData = {
+          id: entityId,
+          data_source_name: entityCollectionName,
+        };
+
+        if (entityData === selectedDataSourceEntityRef.value) return;
+
+        if (selectedDataSourceEntityRef.value) {
+          // first, if present, reset the coloring of the previous selection
+          colorDataSourceEntityById(
+            selectedDataSourceEntityRef.value.data_source_name,
+            selectedDataSourceEntityRef.value.id,
+            defaultMaterialCesiumColor,
+            defaultOutlineCesiumColor
+          );
+        }
+        // color highlight the new selection
+        colorDataSourceEntityById(
+          entityData.data_source_name,
+          entityData.id,
+          deepTealCesiumColor,
+          aquaAccentCesiumColor
+        );
+        // then, update the selected entity ref
+        selectedDataSourceEntityRef.value = entityData;
+      }
+
+      const hierarchy = entity.polygon?.hierarchy?.getValue(viewerRef.value.clock.currentTime);
+      if (hierarchy instanceof PolygonHierarchy) {
+        const polygonHierarchy = hierarchy as PolygonHierarchy;
+        console.log("polygon POSITIONS:\n", polygonHierarchy.positions);
+      }
+    }
+  }
 }
 
 // utility "throttle" function to attempt at fixing the slow update of the tooltip
