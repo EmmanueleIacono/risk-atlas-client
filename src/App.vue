@@ -7,6 +7,7 @@
   <div class="page-content">
     <CesiumViewer />
     <MenuContainer />
+    <IoTChartViewer v-if="activeOverlayRef === 'iot'" />
     <MetadataTooltip />
   </div>
 </template>
@@ -18,14 +19,15 @@ import GlobalLoader from "./components/GlobalLoader.vue";
 import TopNavbar from "./components/TopNavbar.vue";
 import CesiumViewer from "./components/CesiumViewer.vue";
 import MenuContainer from "./components/MenuContainer.vue";
+import IoTChartViewer from "./components/IoTChartViewer.vue";
 import MetadataTooltip from "./components/MetadataTooltip.vue";
 
-const { loading } = useGlobalStore();
+const { loading, activeOverlayRef } = useGlobalStore();
 
 const menu_items: NavbarItem[] = [
   {id: "gis", name: "GIS Data"},
   {id: "bim", name: "BIM Data"},
-  {id: "iot", name: "Real-Time Data"},
+  {id: "iot", name: "Sensor Data"},
   {id: "dash", name: "Dashboard"},
 ];
 </script>

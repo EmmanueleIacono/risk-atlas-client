@@ -1,6 +1,9 @@
 const raw_server_root: string = import.meta.env.VITE_ROOT_SERVER_URL;
+const raw_websocket_root: string = import.meta.env.VITE_WS_URL;
 
+// removing trailing slashes
 const server_root = raw_server_root.replace(/\/+$/, "");
+const websocket_root = raw_websocket_root.replace(/\/+$/, "");
 
 function buildProjectsUrl() {
   return `${server_root}/tilesets/projects`;
@@ -23,6 +26,10 @@ function buildFloodHazardUrl() {
   return `${server_root}/risk-scores/hazards/flood`;
 }
 
+function buildWsBaseSensorsUrl() {
+  return `${websocket_root}/ws-sensors`;
+}
+
 export function useServerStore() {
   return {
     buildProjectsUrl,
@@ -30,5 +37,6 @@ export function useServerStore() {
     buildTilesetUrl,
     buildOSMBuildingsUrl,
     buildFloodHazardUrl,
+    buildWsBaseSensorsUrl,
   };
 }

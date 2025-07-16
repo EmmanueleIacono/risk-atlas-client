@@ -7,6 +7,11 @@ const deepTealCesiumColor = Color.fromBytes(0 , 123, 131, 255); // #007b83 (--RA
 const aquaAccentCesiumColor = Color.fromBytes(0 , 198, 179, 255); // #00c6b3 (--RA-aqua-accent)
 
 const loading = ref<boolean>(false);
+const activeOverlayRef = ref<string | null>(null);
+
+function updateActiveOverlayRef(selected_overlay: string | null) {
+    activeOverlayRef.value = selected_overlay;
+}
 
 export function useGlobalStore() {
     return {
@@ -14,6 +19,8 @@ export function useGlobalStore() {
         defaultOutlineCesiumColor,
         deepTealCesiumColor,
         aquaAccentCesiumColor,
-        loading
+        loading,
+        activeOverlayRef,
+        updateActiveOverlayRef,
     };
 }

@@ -11,7 +11,7 @@
       <hr>
     </div>
     <div v-show="activeMenuRef === 'iot'">
-      <i>Real-Time Data Menu here</i>
+      <IoTMenu />
       <hr>
     </div>
     <div v-show="activeMenuRef === 'dash'">
@@ -33,6 +33,7 @@ import { useTilesetAddRemove } from "../composables/useTilesetAddRemove";
 import BIMMenuFlyTo from "./BIMMenuFlyTo.vue";
 import BIMMenuProjects from "./BIMMenuProjects.vue";
 import GISMenu from "./GISMenu.vue";
+import IoTMenu from "./IoTMenu.vue";
 
 const { buildProjectsUrl, buildClassesUrl } = useServerStore();
 const { availableProjectsMapRef, availableIfcClassesRef } = useCesiumStore();
