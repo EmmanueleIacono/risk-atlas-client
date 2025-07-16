@@ -10,17 +10,17 @@ const loading = ref<boolean>(false);
 const activeOverlayRef = ref<string | null>(null);
 
 function updateActiveOverlayRef(selected_overlay: string | null) {
-    activeOverlayRef.value = selected_overlay;
+  activeOverlayRef.value = selected_overlay;
 }
 
 export function useGlobalStore() {
-    return {
-        defaultMaterialCesiumColor,
-        defaultOutlineCesiumColor,
-        deepTealCesiumColor,
-        aquaAccentCesiumColor,
-        loading,
-        activeOverlayRef,
-        updateActiveOverlayRef,
-    };
+  return {
+    defaultMaterialCesiumColor,
+    defaultOutlineCesiumColor,
+    deepTealCesiumColor,
+    aquaAccentCesiumColor,
+    loading,
+    activeOverlayRef,
+    updateActiveOverlayRef,
+  };
 }

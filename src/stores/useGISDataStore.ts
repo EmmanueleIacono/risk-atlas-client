@@ -7,9 +7,9 @@ const lastBboxStrRef = ref<string | null>(null);
 const OSMBuildingsDsRef = ref<DataSource | null>(null);
 
 export function useGISDataStore() {
-    return {
-        MAX_OSM_FETCH_HEIGHT,
-        lastBboxStrRef,
-        OSMBuildingsDsRef
-    };
+  return {
+    MAX_OSM_FETCH_HEIGHT,
+    lastBboxStrRef,
+    OSMBuildingsDsRef
+  };
 }
