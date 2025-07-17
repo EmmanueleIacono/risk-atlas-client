@@ -44,6 +44,13 @@ type PointLocationInfo = {
   lat: number
 };
 
+type SensorPayload = {
+  sensor_id: string,
+  timestamp: string, // ISO string
+  measurement: number | Record<string, number>,
+  units: string | Record<string, string>,
+};
+
 export {
   NavbarItem,
   ViewerBbox,
@@ -53,4 +60,5 @@ export {
   IfcClassesInfo,
   TilesetLocationInfo,
   PointLocationInfo,
+  SensorPayload,
 }
