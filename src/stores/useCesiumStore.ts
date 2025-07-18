@@ -1,6 +1,6 @@
-import {computed, ref, watch} from "vue";
-import type {Viewer, Cesium3DTileset} from "cesium";
-import { ProjectInfo, ViewerBbox, IfcClassesInfo, TilesetLocationInfo, DataSourceEntityData } from "../types/types";
+import { computed, ref } from "vue";
+import type { Viewer, Cesium3DTileset } from "cesium";
+import { ProjectInfo, ViewerBbox, IfcClassesInfo, TilesetLocationInfo, DataSourceEntityData, SensorData } from "../types/types";
 
 const viewerRef = ref<Viewer | null>(null);
 const currentViewerBboxRef = ref<ViewerBbox>({
@@ -12,6 +12,7 @@ const currentViewerBboxRef = ref<ViewerBbox>({
 
 const availableProjectsMapRef = ref<Map<string, ProjectInfo>>(new Map());
 const availableIfcClassesRef = ref<IfcClassesInfo[]>([]);
+const availableSensorsRef = ref<SensorData[]>([]);
 
 const tilesetsMapRef = ref<Map<string, Cesium3DTileset>>(new Map()); // reactive hashmap of tileset elements
 const tilesetsLocationsMapRef = ref<Map<string, TilesetLocationInfo>>(new Map()); // reactive hashmap of {proj_id, lon, lat} locations of tilesets
@@ -31,6 +32,7 @@ const availableIfcClassesList = computed(() => {
 });
 
 const selectedDataSourceEntityRef = ref<DataSourceEntityData | null>(null);
+const selectedSensorsRef = ref<string[]>([]);
 
 export function useCesiumStore() {
   return {
@@ -38,9 +40,11 @@ export function useCesiumStore() {
     currentViewerBboxRef,
     availableProjectsMapRef,
     availableIfcClassesRef,
+    availableSensorsRef,
     tilesetsMapRef,
     tilesetsLocationsMapRef,
     availableIfcClassesList,
     selectedDataSourceEntityRef,
+    selectedSensorsRef,
   };
 }

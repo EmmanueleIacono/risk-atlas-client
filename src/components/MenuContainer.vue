@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { ProjectInfo, IfcClassesInfo } from "../types/types";
+import { ProjectInfo, IfcClassesInfo, SensorData } from "../types/types";
 import { useServerStore } from "../stores/useServerStore";
 import { useCesiumStore } from "../stores/useCesiumStore";
 import { useNavbarStore } from "../stores/useNavbarStore";
@@ -35,8 +35,8 @@ import BIMMenuProjects from "./BIMMenuProjects.vue";
 import GISMenu from "./GISMenu.vue";
 import IoTMenu from "./IoTMenu.vue";
 
-const { buildProjectsUrl, buildClassesUrl } = useServerStore();
-const { availableProjectsMapRef, availableIfcClassesRef } = useCesiumStore();
+const { buildProjectsUrl, buildClassesUrl, buildSensorsUrl } = useServerStore();
+const { availableProjectsMapRef, availableIfcClassesRef, availableSensorsRef } = useCesiumStore();
 const { activeMenuRef } = useNavbarStore();
 const { removeOSMBuildings } = useOSMAddRemove();
 const { removeAllTilesets } = useTilesetAddRemove();
@@ -44,10 +44,12 @@ const { removeAllTilesets } = useTilesetAddRemove();
 onMounted(async () => {
   const projects: ProjectInfo[] = await getAvailableProjects();
   const classes: IfcClassesInfo[] = await getAvailableIfcClasses();
+  const sensors: SensorData[] = await getAvailableSensors();
   projects.forEach((pi: ProjectInfo) => {
     availableProjectsMapRef.value.set(pi.project_id, pi);
   });
   availableIfcClassesRef.value = classes;
+  availableSensorsRef.value = sensors;
 });
 
 async function getAvailableProjects() {
@@ -64,9 +66,17 @@ async function getAvailableIfcClasses() {
   return classes;
 }
 
+async function getAvailableSensors() {
+  const full_url = buildSensorsUrl();
+  const resp = await fetch(full_url);
+  const sensors = await resp.json();
+  return sensors;
+}
+
 function resetViewer() {
   removeOSMBuildings();
   removeAllTilesets();
+  // remove sensor points...
 }
 </script>
 

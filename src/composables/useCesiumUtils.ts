@@ -1,7 +1,9 @@
-import { Cesium3DTileset, Cartographic, Matrix4, Cartesian4, Cartesian3, Rectangle, Math as CsmMath, type Color, PolygonGraphics, Entity } from "cesium";
+import { Cesium3DTileset, Cartographic, Color, Matrix4, Cartesian4, Cartesian3, Rectangle, Math as CsmMath, PolygonGraphics, Entity, sampleTerrainMostDetailed, VerticalOrigin, Cartesian2, HeightReference, PropertyBag } from "cesium";
 import { useCesiumStore } from "../stores/useCesiumStore";
+import { useGlobalStore } from "../stores/useGlobalStore";
 
 const { viewerRef, currentViewerBboxRef } = useCesiumStore();
+const { deepTealCesiumColor, aquaAccentCesiumColor } = useGlobalStore();
 
 function cleanProjectId(raw_project_id: string): string {
   const clean_tileset_id: string = raw_project_id.includes("?filters=") ? raw_project_id.split("?filters=")[0] : raw_project_id;
@@ -105,6 +107,77 @@ function colorDataSourceEntity(
   if (outlineColor) entity.polygon.outlineColor = propContainer.outlineColor;
 }
 
+async function createSphere(
+  name: string,
+  longitude: number,
+  latitude: number,
+  height_from_ground: number,
+  radius: number = 1000,
+  properties: { [key: string]: any } = {},
+): Promise<void> {
+  if (!viewerRef.value) return;
+
+  const cartographics = [Cartographic.fromDegrees(longitude, latitude)];
+  await sampleTerrainMostDetailed( // FIX: make checks and avoid if ELLIPSOID
+    viewerRef.value.terrainProvider,
+    cartographics
+  );
+
+  const terrainHeight = cartographics[0].height;
+  const finalHeight = terrainHeight + height_from_ground;
+
+  const position = Cartesian3.fromRadians(
+    cartographics[0].longitude,
+    cartographics[0].latitude,
+    finalHeight
+  );
+
+  let props_bag: PropertyBag | undefined;
+  let descr: string | undefined;
+  if (Object.entries(properties).length > 0) {
+    props_bag = new PropertyBag(properties);
+    descr = makeInfoBoxDescription(properties);
+  }
+
+  const sphere = viewerRef.value.entities.add(
+    {
+      position: position,
+      ellipsoid: {
+        radii: new Cartesian3(radius, radius, radius),
+        material: deepTealCesiumColor,
+      },
+      label: {
+        text: name,
+        font: '10pt sans-serif',
+        fillColor: aquaAccentCesiumColor,
+        showBackground: true,
+        backgroundColor: Color.BLACK,
+        backgroundPadding: new Cartesian2(5, 5),
+        verticalOrigin: VerticalOrigin.BOTTOM,
+        pixelOffset: new Cartesian2(0, -radius * 50),
+        heightReference: HeightReference.NONE, // using NONE so the label stays glued to the sphere's position
+      },
+      properties: props_bag,
+      name: name,
+      description: descr,
+    }
+  );
+}
+
+function makeInfoBoxDescription(props: { [key: string]: any }): string {
+  // building a simple HTML table of key/valye rows
+  const rows = Object.entries(props)
+    .map(([key, val]) =>
+      `<tr>
+        <th>${key}</th>
+        <td>${val}</td>
+      </tr>`
+    )
+    .join('');
+
+  return `<table class="cesium-infoBox-defaultTable">${rows}</table>`; // class name "cesium-infoBox-defaultTable" ensures same style of default Cesium InfoBox
+}
+
 export function useCesiumUtils() {
   return {
     cleanProjectId,
@@ -114,5 +187,7 @@ export function useCesiumUtils() {
     updateCurrentBbox,
     colorDataSourceEntityById,
     colorDataSourceEntity,
+    createSphere,
+    makeInfoBoxDescription,
   };
 }

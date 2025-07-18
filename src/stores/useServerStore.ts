@@ -26,6 +26,10 @@ function buildFloodHazardUrl() {
   return `${server_root}/risk-scores/hazards/flood`;
 }
 
+function buildSensorsUrl() {
+  return `${server_root}/iot/sensors`;
+}
+
 function buildWsBaseSensorsUrl() {
   return `${websocket_root}/ws-sensors`;
 }
@@ -37,6 +41,7 @@ export function useServerStore() {
     buildTilesetUrl,
     buildOSMBuildingsUrl,
     buildFloodHazardUrl,
+    buildSensorsUrl,
     buildWsBaseSensorsUrl,
   };
 }

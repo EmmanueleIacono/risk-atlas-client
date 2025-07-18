@@ -42,7 +42,7 @@ const canvasRef = ref<HTMLCanvasElement>();
 const sensorIdRef = ref<string | null>(null);
 
 onMounted(async () => {
-  sensorIdRef.value = 'seis-001'; // REFACTOR LATER
+  sensorIdRef.value = 'seismograph_001'; // REFACTOR LATER
   await nextTick();
   if (!canvasRef.value) return;
 

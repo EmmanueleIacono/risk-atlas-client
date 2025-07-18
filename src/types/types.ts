@@ -44,6 +44,17 @@ type PointLocationInfo = {
   lat: number
 };
 
+type SensorData = {
+  sensor_id: string,
+  name: string,
+  description: string,
+  lat: number,
+  lon: number,
+  ground_h: number,
+  project_id: string | null,
+  element_id: string | null
+};
+
 type SensorPayload = {
   sensor_id: string,
   timestamp: string, // ISO string
@@ -60,5 +71,6 @@ export {
   IfcClassesInfo,
   TilesetLocationInfo,
   PointLocationInfo,
+  SensorData,
   SensorPayload,
 }
