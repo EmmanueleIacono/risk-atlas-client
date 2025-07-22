@@ -10,12 +10,12 @@ import { useCesiumUtils } from "../composables/useCesiumUtils";
 import { useTilesetClamping } from "../composables/useTilesetClamping";
 import { useSensorsUtils } from "../composables/useSensorsUtils";
 
-// EU
+// IT
 const home_coords = {
-  west: -0.2222,
-  south: 0.63626,
-  east: 0.7169,
-  north: 1.2155
+  west: 0.0928,
+  south: 0.6387,
+  east: 0.3387,
+  north: 0.8134
 };
 
 const containerRef = ref<HTMLDivElement | null>(null);
