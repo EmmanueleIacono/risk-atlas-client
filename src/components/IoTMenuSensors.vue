@@ -15,7 +15,6 @@
           <label class="menu-input-cbx" :for="`cbx-${sens.sensor_id}`">{{ sens.name ? sens.name : sens.sensor_id }}</label>
         </div>
       </div>
-      <button @click="toggleIoTOverlay">IoT chart</button>
     </details>
     <hr>
     <button
@@ -24,6 +23,12 @@
       @click="loadSelectedSensors"
     >
       <b>Load sensors</b>
+    </button>
+    <button
+      class="menu-button"
+      @click="toggleIoTOverlay"
+    >
+      <b>{{activeOverlayRef === 'iot' ? "Close" : "View"}} sensor chart</b>
     </button>
   </div>
 </template>
@@ -38,7 +43,7 @@ import { useCesiumUtils } from "../composables/useCesiumUtils";
 import { useSensorsUtils } from "../composables/useSensorsUtils";
 
 let overlay_bool: boolean = false;
-const { updateActiveOverlayRef } = useGlobalStore();
+const { activeOverlayRef, updateActiveOverlayRef } = useGlobalStore();
 const { viewerRef, currentViewerBboxRef, availableSensorsMapRef, selectedSensorsRef } = useCesiumStore();
 const { MAX_OSM_FETCH_HEIGHT } = useGISDataStore();
 const { createSphere } = useCesiumUtils();

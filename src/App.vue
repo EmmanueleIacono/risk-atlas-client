@@ -133,7 +133,7 @@ hr {
   text-align: left;
 }
 
-.menu-input-cbx:disabled {
+.menu-button:disabled, .menu-input-cbx:disabled {
   cursor: not-allowed;
 }
 </style>
