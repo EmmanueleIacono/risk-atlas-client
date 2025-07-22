@@ -11,7 +11,9 @@
       <hr>
     </div>
     <div v-show="activeMenuRef === 'iot'">
-      <IoTMenu />
+      <IoTMenuFLyTo />
+      <hr>
+      <IoTMenuSensors />
       <hr>
     </div>
     <div v-show="activeMenuRef === 'dash'">
@@ -30,16 +32,19 @@ import { useCesiumStore } from "../stores/useCesiumStore";
 import { useNavbarStore } from "../stores/useNavbarStore";
 import { useOSMAddRemove } from "../composables/useOSMAddRemove";
 import { useTilesetAddRemove } from "../composables/useTilesetAddRemove";
+import { useSensorsUtils } from "../composables/useSensorsUtils";
 import BIMMenuFlyTo from "./BIMMenuFlyTo.vue";
 import BIMMenuProjects from "./BIMMenuProjects.vue";
 import GISMenu from "./GISMenu.vue";
-import IoTMenu from "./IoTMenu.vue";
+import IoTMenuSensors from "./IoTMenuSensors.vue";
+import IoTMenuFLyTo from "./IoTMenuFLyTo.vue";
 
 const { buildProjectsUrl, buildClassesUrl, buildSensorsUrl } = useServerStore();
-const { availableProjectsMapRef, availableIfcClassesRef, availableSensorsRef } = useCesiumStore();
+const { availableProjectsMapRef, availableIfcClassesRef, availableSensorsMapRef } = useCesiumStore();
 const { activeMenuRef } = useNavbarStore();
 const { removeOSMBuildings } = useOSMAddRemove();
 const { removeAllTilesets } = useTilesetAddRemove();
+const { removeAllSensors } = useSensorsUtils();
 
 onMounted(async () => {
   const projects: ProjectInfo[] = await getAvailableProjects();
@@ -49,7 +54,9 @@ onMounted(async () => {
     availableProjectsMapRef.value.set(pi.project_id, pi);
   });
   availableIfcClassesRef.value = classes;
-  availableSensorsRef.value = sensors;
+  sensors.forEach((sns: SensorData) => {
+    availableSensorsMapRef.value.set(sns.sensor_id, sns);
+  });
 });
 
 async function getAvailableProjects() {
@@ -76,7 +83,7 @@ async function getAvailableSensors() {
 function resetViewer() {
   removeOSMBuildings();
   removeAllTilesets();
-  // remove sensor points...
+  removeAllSensors();
 }
 </script>
 

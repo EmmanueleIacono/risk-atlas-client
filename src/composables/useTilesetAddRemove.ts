@@ -65,6 +65,6 @@ function removeAllTilesets() {
 export function useTilesetAddRemove() {
   return {
     add3DTilesetToViewer,
-    removeAllTilesets
+    removeAllTilesets,
   };
 }

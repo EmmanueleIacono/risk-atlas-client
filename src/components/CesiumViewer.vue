@@ -5,11 +5,13 @@
 <script setup lang="ts">
 import { useCesiumStore } from "../stores/useCesiumStore";
 import { ref, onMounted } from "vue";
-import { Camera, Viewer, createWorldTerrainAsync, NearFarScalar, Rectangle, InfoBox } from "cesium";
+import { Camera, Viewer, createWorldTerrainAsync, NearFarScalar, Rectangle } from "cesium";
 import { useCesiumUtils } from "../composables/useCesiumUtils";
 import { useTilesetClamping } from "../composables/useTilesetClamping";
+import { useSensorsUtils } from "../composables/useSensorsUtils";
 
-const home_EU = {
+// EU
+const home_coords = {
   west: -0.2222,
   south: 0.63626,
   east: 0.7169,
@@ -21,11 +23,12 @@ const containerRef = ref<HTMLDivElement | null>(null);
 const { viewerRef, tilesetsMapRef } = useCesiumStore();
 const { updateCurrentBbox } = useCesiumUtils();
 const { attachClampWhenVisible } = useTilesetClamping();
+const { updateSensorPositions } = useSensorsUtils();
 
 onMounted(async () => {
   if (containerRef.value) {
     // home button location settings
-    Camera.DEFAULT_VIEW_RECTANGLE = new Rectangle(home_EU.west, home_EU.south, home_EU.east, home_EU.north);
+    Camera.DEFAULT_VIEW_RECTANGLE = new Rectangle(home_coords.west, home_coords.south, home_coords.east, home_coords.north);
 
     // viewer init
     viewerRef.value = new Viewer(
@@ -59,6 +62,7 @@ onMounted(async () => {
       for (const ts of tilesetsMapRef.value.values()) {
         attachClampWhenVisible(ts);
       }
+      updateSensorPositions();
     });
 
     viewerRef.value.camera.moveEnd.addEventListener(onCameraMoveEnd);

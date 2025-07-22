@@ -1,4 +1,4 @@
-import { Cesium3DTileset, Cartographic, Color, Matrix4, Cartesian4, Cartesian3, Rectangle, Math as CsmMath, PolygonGraphics, Entity, sampleTerrainMostDetailed, VerticalOrigin, Cartesian2, HeightReference, PropertyBag } from "cesium";
+import { Cesium3DTileset, Cartographic, Color, Matrix4, Cartesian4, Cartesian3, Rectangle, Math as CsmMath, PolygonGraphics, Entity, sampleTerrainMostDetailed, VerticalOrigin, Cartesian2, HeightReference, PropertyBag, EllipsoidTerrainProvider } from "cesium";
 import { useCesiumStore } from "../stores/useCesiumStore";
 import { useGlobalStore } from "../stores/useGlobalStore";
 
@@ -107,6 +107,33 @@ function colorDataSourceEntity(
   if (outlineColor) entity.polygon.outlineColor = propContainer.outlineColor;
 }
 
+async function computeTerrainHeightAtLocation(
+  longitude_degs: number,
+  latitude_degs: number
+): Promise<number | void> {
+  if (!viewerRef.value) return;
+  const viewer = viewerRef.value;
+
+  let terrain_height: number;
+  try {
+    if (viewer.terrainProvider instanceof EllipsoidTerrainProvider) { // if ellipsoid, terrain height is assumed as 0
+      terrain_height = 0;
+    } else {
+      const cartographics = Cartographic.fromDegrees(longitude_degs, latitude_degs);
+      const [updated_carto] = await sampleTerrainMostDetailed(
+        viewer.terrainProvider,
+        [cartographics],
+        true
+      );
+      terrain_height = updated_carto.height ?? 0;
+    }
+    return terrain_height;
+  } catch (err) {
+    console.error("An error occured while computing the terrain height:\n");
+    console.error(err);
+  }
+}
+
 async function createSphere(
   name: string,
   longitude: number,
@@ -114,21 +141,15 @@ async function createSphere(
   height_from_ground: number,
   radius: number = 1000,
   properties: { [key: string]: any } = {},
-): Promise<void> {
+): Promise<Entity | undefined> {
   if (!viewerRef.value) return;
 
-  const cartographics = [Cartographic.fromDegrees(longitude, latitude)];
-  await sampleTerrainMostDetailed( // FIX: make checks and avoid if ELLIPSOID
-    viewerRef.value.terrainProvider,
-    cartographics
-  );
+  const terrainHeight = await computeTerrainHeightAtLocation(longitude, latitude);
+  const finalHeight = (terrainHeight ?? 0) + height_from_ground;
 
-  const terrainHeight = cartographics[0].height;
-  const finalHeight = terrainHeight + height_from_ground;
-
-  const position = Cartesian3.fromRadians(
-    cartographics[0].longitude,
-    cartographics[0].latitude,
+  const position = Cartesian3.fromDegrees(
+    longitude,
+    latitude,
     finalHeight
   );
 
@@ -162,6 +183,8 @@ async function createSphere(
       description: descr,
     }
   );
+
+  return sphere;
 }
 
 function makeInfoBoxDescription(props: { [key: string]: any }): string {
@@ -169,7 +192,7 @@ function makeInfoBoxDescription(props: { [key: string]: any }): string {
   const rows = Object.entries(props)
     .map(([key, val]) =>
       `<tr>
-        <th>${key}</th>
+        <th><b>${key}</b></th>
         <td>${val}</td>
       </tr>`
     )
@@ -187,6 +210,7 @@ export function useCesiumUtils() {
     updateCurrentBbox,
     colorDataSourceEntityById,
     colorDataSourceEntity,
+    computeTerrainHeightAtLocation,
     createSphere,
     makeInfoBoxDescription,
   };
