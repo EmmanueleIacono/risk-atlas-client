@@ -43,6 +43,36 @@
             <label class="menu-input-cbx" for="cbx-city">Municipalities</label>
           </div>
         </div>
+        <div class="hazard-data-container">
+          <p class="hazard-data-title"><b>Hazard Maps</b></p>
+          <div>
+            <input
+              class="menu-input-cbx"
+              v-model="hazardMapsFloodToLoadRef"
+              type="checkbox"
+              id="cbx-fld"
+            >
+            <label class="menu-input-cbx" for="cbx-fld">Flood</label>
+          </div>
+          <div>
+            <input
+              class="menu-input-cbx"
+              v-model="hazardMapsLandslideToLoadRef"
+              type="checkbox"
+              id="cbx-lnd"
+            >
+            <label class="menu-input-cbx" for="cbx-lnd">Landslide</label>
+          </div>
+          <div>
+            <input
+              class="menu-input-cbx"
+              v-model="hazardMapsSeismicToLoadRef"
+              type="checkbox"
+              id="cbx-ssm"
+            >
+            <label class="menu-input-cbx" for="cbx-ssm">Seismic</label>
+          </div>
+        </div>
       </div>
     </details>
     <hr>
@@ -70,11 +100,13 @@ import { useGeoUtils } from "../composables/useGeoUtils";
 import { useGlobalUtils } from "../composables/useGlobalUtils";
 import { useCesiumUtils } from "../composables/useCesiumUtils";
 import { PointLocationInfo } from "../types/types";
+import { useFgbAddRemove } from "../composables/useFgbAddRemove";
 
 const { loading } = useGlobalStore();
 const { MAX_OSM_FETCH_HEIGHT } = useGISDataStore();
 const { currentViewerBboxRef, viewerRef } = useCesiumStore();
 const { getOSMBuildings, addOSMBuildings, removeOSMBuildings, extrudeOSMBuildings, collectOSMPositions } = useOSMAddRemove();
+const { fetchAndAddHazard, removeHazardLayer } = useFgbAddRemove();
 const { getFloodHazardScores } = useHazardUtils();
 const { computeCentroid } = useGeoUtils();
 const { getGradientColor } = useGlobalUtils();
@@ -86,6 +118,9 @@ const OSMToLoadRef = ref<boolean>(false);
 const adminBoundsRegionsToLoadRef = ref<boolean>(false);
 const adminBoundsProvincesToLoadRef = ref<boolean>(false);
 const adminBoundsCitiesToLoadRef = ref<boolean>(false);
+const hazardMapsFloodToLoadRef = ref<boolean>(false);
+const hazardMapsLandslideToLoadRef = ref<boolean>(false);
+const hazardMapsSeismicToLoadRef = ref<boolean>(false);
 
 watch(() => [currentViewerBboxRef.value, OSMToLoadRef.value, autoUpdateRef.value], async () => {
   if (!viewerRef.value) return;
@@ -100,18 +135,25 @@ watch(() => [currentViewerBboxRef.value, OSMToLoadRef.value, autoUpdateRef.value
 });
 
 async function reloadGISData() {
+  loading.value = true;
   if (OSMToLoadRef.value) {
-    loading.value = true;
     const osmGeoJSON = await getOSMBuildings();
     if (osmGeoJSON) {
       removeOSMBuildings(); // remove previous OSM data, if any
       await addOSMBuildings(osmGeoJSON); // add the new OSM data
       extrudeOSMBuildings(); // extrude the OSM data
     }
-    loading.value = false;
   } else {
     removeOSMBuildings();
+    // removeHazardLayer("landslide");
+    // removeHazardLayer("seismic");
   }
+  if (hazardMapsFloodToLoadRef.value) {
+    await fetchAndAddHazard("flooding");
+  } else {
+    removeHazardLayer("flooding");
+  }
+  loading.value = false;
 }
 
 async function loadHazardScores() {
@@ -140,7 +182,8 @@ async function loadHazardScores() {
     .filter(ec => ec != null && ec != undefined)
     .map((ec): PointLocationInfo => {
       return {
-        id: parseInt(ec.entity.id),
+        // id: parseInt(ec.entity.id),
+        id: (ec.entity.id).toString(),
         lon: ec.centroid.lon,
         lat: ec.centroid.lat,
       };
@@ -153,7 +196,7 @@ async function loadHazardScores() {
     const entityId = (score.id).toString();
     const entityScore: number = score.score;
     const entityScoreColor = getGradientColor(entityScore);
-    console.log("score: ", entityScore, " color: ", entityScoreColor);
+    // console.log("score: ", entityScore, " color: ", entityScoreColor);
     const cesiumMaterialColor = Color.fromBytes(entityScoreColor.r, entityScoreColor.g, entityScoreColor.b, 180);
     const cesiumOutlineColor = Color.fromBytes(entityScoreColor.r, entityScoreColor.g, entityScoreColor.b, 255);
     // const entity = entityIdMap.get(entityId);
@@ -169,11 +212,13 @@ async function loadHazardScores() {
 </script>
 
 <style scoped>
-.admin-bounds-container {
+.admin-bounds-container,
+.hazard-data-container {
   padding: 10px 7px;
 }
 
-.admin-bounds-title {
+.admin-bounds-title,
+.hazard-data-title {
   margin: 0;
   color: #fff;
 }

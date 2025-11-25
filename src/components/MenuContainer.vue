@@ -17,7 +17,8 @@
       <hr>
     </div>
     <div v-show="activeMenuRef === 'dash'">
-      <i>Dashboard Menu here</i>
+      <!-- <i>Dashboard Menu here</i> -->
+      <Dashboard />
       <hr>
     </div>
     <button class="menu-button" @click="resetViewer"><b>Reset Viewer</b></button>
@@ -38,11 +39,14 @@ import BIMMenuProjects from "./BIMMenuProjects.vue";
 import GISMenu from "./GISMenu.vue";
 import IoTMenuSensors from "./IoTMenuSensors.vue";
 import IoTMenuFLyTo from "./IoTMenuFLyTo.vue";
+import Dashboard from "./Dashboard.vue";
+import { useFgbAddRemove } from "../composables/useFgbAddRemove";
 
 const { buildProjectsUrl, buildClassesUrl, buildSensorsUrl } = useServerStore();
 const { availableProjectsMapRef, availableIfcClassesRef, availableSensorsMapRef } = useCesiumStore();
 const { activeMenuRef } = useNavbarStore();
 const { removeOSMBuildings } = useOSMAddRemove();
+const { removeHazardLayer } = useFgbAddRemove();
 const { removeAllTilesets } = useTilesetAddRemove();
 const { removeAllSensors } = useSensorsUtils();
 
@@ -82,6 +86,9 @@ async function getAvailableSensors() {
 
 function resetViewer() {
   removeOSMBuildings();
+  removeHazardLayer("flooding");
+  removeHazardLayer("landslide");
+  removeHazardLayer("seismic");
   removeAllTilesets();
   removeAllSensors();
 }

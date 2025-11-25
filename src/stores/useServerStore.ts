@@ -22,6 +22,18 @@ function buildOSMBuildingsUrl() {
   return `${server_root}/geospatial/fgb/osm/buildings`;
 }
 
+function buildFgbFloodHazardUrl() {
+  return `${server_root}/geospatial/fgb/hazards/flooding`;
+}
+
+function buildFgbLandslideHazardUrl() {
+  return `${server_root}/geospatial/fgb/hazards/landslide`;
+}
+
+function buildFgbSeismicHazardUrl() {
+  return `${server_root}/geospatial/fgb/hazards/seismic`;
+}
+
 function buildFloodHazardUrl() {
   return `${server_root}/risk-scores/hazards/flood`;
 }
@@ -40,7 +52,10 @@ export function useServerStore() {
     buildClassesUrl,
     buildTilesetUrl,
     buildOSMBuildingsUrl,
+    buildFgbFloodHazardUrl,
     buildFloodHazardUrl,
+    buildFgbLandslideHazardUrl,
+    buildFgbSeismicHazardUrl,
     buildSensorsUrl,
     buildWsBaseSensorsUrl,
   };

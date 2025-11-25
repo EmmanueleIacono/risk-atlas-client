@@ -10,7 +10,8 @@ async function getFloodHazardScores(points: PointLocationInfo[]) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(points)
   });
-  const scoreData: { id: number, score: number }[] = await res.json();
+  // const scoreData: { id: number, score: number }[] = await res.json();
+  const scoreData: { id: string, score: number }[] = await res.json();
 
   return scoreData;
 }

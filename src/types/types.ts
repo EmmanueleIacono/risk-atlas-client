@@ -39,7 +39,8 @@ type TilesetLocationInfo = {
 };
 
 type PointLocationInfo = {
-  id: number,
+  // id: number,
+  id: string,
   lon: number,
   lat: number
 };

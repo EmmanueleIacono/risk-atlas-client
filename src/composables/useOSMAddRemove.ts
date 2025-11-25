@@ -133,7 +133,7 @@ function collectOSMPositions() {
       coords = position.map((cart, idx): PointLocationInfo => {
         const c = Cartographic.fromCartesian(cart);
         return {
-          id: idx,
+          id: idx.toString(),
           lon: CsmMath.toDegrees(c.longitude),
           lat: CsmMath.toDegrees(c.latitude),
         };
