@@ -84,7 +84,20 @@
       <label for="auto">Auto</label>
       <button v-if="!autoUpdateRef" @click="reloadGISData" class="menu-button">Load GIS Data</button>
       <hr>
-      <button @click="loadHazardScores" class="menu-button">Assess Flood Hazard</button>
+      <div class="hazard-assessment-selector">
+        <p class="hazard-assessment-title"><b>Hazard Assessment</b></p>
+
+        <input type="radio" id="assess-flooding" value="flooding" v-model="selectedHazardAssessmentRef">
+        <label for="assess-flooding">Flooding</label>
+
+        <input type="radio" id="assess-landslide" value="landslide" v-model="selectedHazardAssessmentRef">
+        <label for="assess-landslide">Landslide</label>
+
+        <input type="radio" id="assess-seismic" value="seismic" v-model="selectedHazardAssessmentRef">
+        <label for="assess-seismic">Seismic</label>
+      </div>
+
+      <button @click="loadHazardScores" class="menu-button">Assess Hazard</button>
     </div>
   </div>
 </template>
@@ -100,7 +113,7 @@ import { useHazardUtils } from "../composables/useHazardUtils";
 import { useGeoUtils } from "../composables/useGeoUtils";
 import { useGlobalUtils } from "../composables/useGlobalUtils";
 import { useCesiumUtils } from "../composables/useCesiumUtils";
-import { PointLocationInfo } from "../types/types";
+import { HazardType, PointLocationInfo } from "../types/types";
 import { useFgbAddRemove } from "../composables/useFgbAddRemove";
 
 const { loading } = useGlobalStore();
@@ -108,7 +121,7 @@ const { MAX_OSM_FETCH_HEIGHT } = useGISDataStore();
 const { currentViewerBboxRef, viewerRef } = useCesiumStore();
 const { getOSMBuildings, addOSMBuildings, removeOSMBuildings, extrudeOSMBuildings, collectOSMPositions } = useOSMAddRemove();
 const { fetchAndAddAdminBounds, fetchAndAddHazard, removeAdminBoundsLayer, removeHazardLayer } = useFgbAddRemove();
-const { getFloodHazardScores } = useHazardUtils();
+const { getHazardScores } = useHazardUtils();
 const { computeCentroid } = useGeoUtils();
 const { getGradientColor } = useGlobalUtils();
 const { colorDataSourceEntity, colorDataSourceEntityById } = useCesiumUtils();
@@ -122,6 +135,7 @@ const adminBoundsCitiesToLoadRef = ref<boolean>(false);
 const hazardMapsFloodToLoadRef = ref<boolean>(false);
 const hazardMapsLandslideToLoadRef = ref<boolean>(false);
 const hazardMapsSeismicToLoadRef = ref<boolean>(false);
+const selectedHazardAssessmentRef = ref<HazardType>("flooding");
 
 watch(() => [currentViewerBboxRef.value, OSMToLoadRef.value, autoUpdateRef.value], async () => {
   if (!viewerRef.value) return;
@@ -186,7 +200,10 @@ async function loadHazardScores() {
   loading.value = true;
   const entityPositionData = collectOSMPositions();
   // console.log(entityPositionData);
-  if (!entityPositionData) return;
+  if (!entityPositionData) {
+    loading.value = false;
+    return; 
+  }
 
   const entityIdMap = new Map<string, Entity>();
 
@@ -216,9 +233,9 @@ async function loadHazardScores() {
     });
 
   console.log("entity points:\n", entityPoints);
-  const floodHazardScore = await getFloodHazardScores(entityPoints);
-  console.log(`flood hazard scores:\n`, floodHazardScore);
-  for (const score of floodHazardScore) {
+  const hazardScore = await getHazardScores(selectedHazardAssessmentRef.value, entityPoints);
+  console.log(`hazard scores:\n`, hazardScore);
+  for (const score of hazardScore) {
     const entityId = (score.id).toString();
     const entityScore: number = score.score;
     const entityScoreColor = getGradientColor(entityScore);

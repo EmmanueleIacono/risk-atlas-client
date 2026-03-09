@@ -87,6 +87,11 @@ type HazardConfigByType = {
   seismic: ContinuousHazardConfig;
 };
 
+type HazardScore = {
+  id: string;
+  score: number;
+};
+
 type SensorData = {
   sensor_id: string,
   name: string,
@@ -118,6 +123,7 @@ export {
   HazardType,
   HazardBucket,
   HazardConfigByType,
+  HazardScore,
   SensorData,
   SensorPayload,
 }

@@ -17,7 +17,6 @@
       <hr>
     </div>
     <div v-show="activeMenuRef === 'dash'">
-      <!-- <i>Dashboard Menu here</i> -->
       <Dashboard />
       <hr>
     </div>
