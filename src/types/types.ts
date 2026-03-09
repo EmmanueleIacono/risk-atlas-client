@@ -1,4 +1,5 @@
 import type { Feature } from "flatgeobuf";
+import type { Color } from "cesium";
 
 type NavbarItem = {
   id: string;
@@ -45,6 +46,47 @@ type PointLocationInfo = {
   lat: number
 };
 
+type AdminBoundType = "region" | "province" | "municipality";
+
+type HazardType = "flooding" | "landslide" | "seismic";
+
+type FloodCodes = "LPH" | "MPH" | "HPH";
+type LandslideCodes = "P1" | "P2" | "P3" | "P4" | "AA";
+
+type HazardBucket =
+  | "low"
+  | "medium"
+  | "high"
+  | "very_high"
+  | "attention"
+  | "unknown";
+
+type CategoricalHazardConfig<TCode extends string> = {
+  kind: "categorical";
+  geometry: "polygon";
+  codeFieldCandidates: string[];
+  codeToBucket: Record<TCode, HazardBucket>;
+  fillByBucket: Record<HazardBucket, Color>;
+  outline: Color;
+};
+
+type ContinuousHazardConfig = {
+  kind: "continuous";
+  geometry: "point";
+  valueFieldCandidates: string[]; // e.g. ["ag", "AG", ...]
+  min: number; // 0.0
+  max: number; // 0.2804
+  colorFromValue: (v: number) => Color;
+  pointSize: number;
+  outline?: Color;
+};
+
+type HazardConfigByType = {
+  flooding: CategoricalHazardConfig<FloodCodes>;
+  landslide: CategoricalHazardConfig<LandslideCodes>;
+  seismic: ContinuousHazardConfig;
+};
+
 type SensorData = {
   sensor_id: string,
   name: string,
@@ -72,6 +114,10 @@ export {
   IfcClassesInfo,
   TilesetLocationInfo,
   PointLocationInfo,
+  AdminBoundType,
+  HazardType,
+  HazardBucket,
+  HazardConfigByType,
   SensorData,
   SensorPayload,
 }

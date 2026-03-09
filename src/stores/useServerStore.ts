@@ -22,6 +22,18 @@ function buildOSMBuildingsUrl() {
   return `${server_root}/geospatial/fgb/osm/buildings`;
 }
 
+function buildFgbRegionAdminBoundsUrl() {
+  return `${server_root}/geospatial/fgb/admin-bounds/regions`;
+}
+
+function buildFgbProvinceAdminBoundsUrl() {
+  return `${server_root}/geospatial/fgb/admin-bounds/provinces`;
+}
+
+function buildFgbMunicipalityAdminBoundsUrl() {
+  return `${server_root}/geospatial/fgb/admin-bounds/municipalities`;
+}
+
 function buildFgbFloodHazardUrl() {
   return `${server_root}/geospatial/fgb/hazards/flooding`;
 }
@@ -35,7 +47,15 @@ function buildFgbSeismicHazardUrl() {
 }
 
 function buildFloodHazardUrl() {
-  return `${server_root}/risk-scores/hazards/flood`;
+  return `${server_root}/risk-scores/hazards/flooding`;
+}
+
+function buildLandslideHazardUrl() {
+  return `${server_root}/risk-scores/hazards/landslide`;
+}
+
+function buildSeismicHazardUrl() {
+  return `${server_root}/risk-scores/hazards/seismic`;
 }
 
 function buildSensorsUrl() {
@@ -52,10 +72,15 @@ export function useServerStore() {
     buildClassesUrl,
     buildTilesetUrl,
     buildOSMBuildingsUrl,
+    buildFgbRegionAdminBoundsUrl,
+    buildFgbProvinceAdminBoundsUrl,
+    buildFgbMunicipalityAdminBoundsUrl,
     buildFgbFloodHazardUrl,
-    buildFloodHazardUrl,
     buildFgbLandslideHazardUrl,
     buildFgbSeismicHazardUrl,
+    buildFloodHazardUrl,
+    buildLandslideHazardUrl,
+    buildSeismicHazardUrl,
     buildSensorsUrl,
     buildWsBaseSensorsUrl,
   };

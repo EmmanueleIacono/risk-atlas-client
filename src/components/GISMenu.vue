@@ -83,6 +83,7 @@
       <input type="radio" id="auto" :value="true" v-model="autoUpdateRef">
       <label for="auto">Auto</label>
       <button v-if="!autoUpdateRef" @click="reloadGISData" class="menu-button">Load GIS Data</button>
+      <hr>
       <button @click="loadHazardScores" class="menu-button">Assess Flood Hazard</button>
     </div>
   </div>
@@ -106,7 +107,7 @@ const { loading } = useGlobalStore();
 const { MAX_OSM_FETCH_HEIGHT } = useGISDataStore();
 const { currentViewerBboxRef, viewerRef } = useCesiumStore();
 const { getOSMBuildings, addOSMBuildings, removeOSMBuildings, extrudeOSMBuildings, collectOSMPositions } = useOSMAddRemove();
-const { fetchAndAddHazard, removeHazardLayer } = useFgbAddRemove();
+const { fetchAndAddAdminBounds, fetchAndAddHazard, removeAdminBoundsLayer, removeHazardLayer } = useFgbAddRemove();
 const { getFloodHazardScores } = useHazardUtils();
 const { computeCentroid } = useGeoUtils();
 const { getGradientColor } = useGlobalUtils();
@@ -145,13 +146,38 @@ async function reloadGISData() {
     }
   } else {
     removeOSMBuildings();
-    // removeHazardLayer("landslide");
-    // removeHazardLayer("seismic");
   }
+  // ADMIN BOUNDS
+  if (adminBoundsRegionsToLoadRef.value) {
+    await fetchAndAddAdminBounds("region");
+  } else {
+    removeAdminBoundsLayer("region");
+  }
+  if (adminBoundsProvincesToLoadRef.value) {
+    await fetchAndAddAdminBounds("province");
+  } else {
+    removeAdminBoundsLayer("province");
+  }
+  if (adminBoundsCitiesToLoadRef.value) {
+    await fetchAndAddAdminBounds("municipality");
+  } else {
+    removeAdminBoundsLayer("municipality");
+  }
+  // HAZARD MAPS
   if (hazardMapsFloodToLoadRef.value) {
     await fetchAndAddHazard("flooding");
   } else {
     removeHazardLayer("flooding");
+  }
+  if (hazardMapsLandslideToLoadRef.value) {
+    await fetchAndAddHazard("landslide");
+  } else {
+    removeHazardLayer("landslide");
+  }
+  if (hazardMapsSeismicToLoadRef.value) {
+    await fetchAndAddHazard("seismic");
+  } else {
+    removeHazardLayer("seismic");
   }
   loading.value = false;
 }

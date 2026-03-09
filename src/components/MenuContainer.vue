@@ -46,7 +46,7 @@ const { buildProjectsUrl, buildClassesUrl, buildSensorsUrl } = useServerStore();
 const { availableProjectsMapRef, availableIfcClassesRef, availableSensorsMapRef } = useCesiumStore();
 const { activeMenuRef } = useNavbarStore();
 const { removeOSMBuildings } = useOSMAddRemove();
-const { removeHazardLayer } = useFgbAddRemove();
+const { removeAdminBoundsLayer, removeHazardLayer } = useFgbAddRemove();
 const { removeAllTilesets } = useTilesetAddRemove();
 const { removeAllSensors } = useSensorsUtils();
 
@@ -86,6 +86,9 @@ async function getAvailableSensors() {
 
 function resetViewer() {
   removeOSMBuildings();
+  removeAdminBoundsLayer("region");
+  removeAdminBoundsLayer("province");
+  removeAdminBoundsLayer("municipality");
   removeHazardLayer("flooding");
   removeHazardLayer("landslide");
   removeHazardLayer("seismic");

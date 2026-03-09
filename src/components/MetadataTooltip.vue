@@ -24,6 +24,16 @@ const previousPickedTiles = ref<any[]>([]);
 
 let handler: ScreenSpaceEventHandler | null = null;
 
+const previousSelectedStyleRef = ref<{
+  data_source_name: string;
+  id: string;
+  polygonMaterial?: any;
+  polygonOutlineColor?: any;
+  pointColor?: any;
+  pointOutlineColor?: any;
+  billboardColor?: any;
+} | null>(null);
+
 // this computes the CSS style object of the tooltip
 const tooltipStyle = computed<CSSProperties>(() => {
   return {
@@ -95,12 +105,7 @@ function onLeftClick(movement: any) {
   const pickedObject = viewerRef.value.scene.pick(movement.position);
   if (!pickedObject) { // no selection? default-color previous selection and remove it from ref
     if (selectedDataSourceEntityRef.value) {
-      colorDataSourceEntityById(
-        selectedDataSourceEntityRef.value.data_source_name,
-        selectedDataSourceEntityRef.value.id,
-        defaultMaterialCesiumColor,
-        defaultOutlineCesiumColor
-      );
+      restoreCapturedStyle();
       selectedDataSourceEntityRef.value = null;
     }
   } else { // something is selected? proceed
@@ -120,17 +125,17 @@ function onLeftClick(movement: any) {
           data_source_name: entityCollectionName,
         };
 
-        if (entityData === selectedDataSourceEntityRef.value) return;
+        if (
+          selectedDataSourceEntityRef.value &&
+          selectedDataSourceEntityRef.value.id === entityData.id &&
+          selectedDataSourceEntityRef.value.data_source_name === entityData.data_source_name
+        ) return;
 
         if (selectedDataSourceEntityRef.value) {
           // first, if present, reset the coloring of the previous selection
-          colorDataSourceEntityById(
-            selectedDataSourceEntityRef.value.data_source_name,
-            selectedDataSourceEntityRef.value.id,
-            defaultMaterialCesiumColor,
-            defaultOutlineCesiumColor
-          );
+          restoreCapturedStyle();
         }
+        previousSelectedStyleRef.value = captureEntityStyle(entityData);
         // color highlight the new selection
         colorDataSourceEntityById(
           entityData.data_source_name,
@@ -161,6 +166,47 @@ function throttle<T extends (...args: any[]) => void>(fn: T, wait: number): T {
         fn.apply(this, args);
       }
     } as T;
+}
+
+// some helpers
+function findEntityInDataSource(dataSourceName: string, id: string): Entity | null {
+  if (!viewerRef.value) return null;
+  const ds = viewerRef.value.dataSources.getByName(dataSourceName)[0];
+  if (!ds) return null;
+  return ds.entities.getById(id) ?? null;
+}
+
+function captureEntityStyle(data: DataSourceEntityData) {
+  const e = findEntityInDataSource(data.data_source_name, data.id);
+  if (!e) return null;
+  return {
+    data_source_name: data.data_source_name,
+    id: data.id,
+    polygonMaterial: e.polygon?.material,
+    polygonOutlineColor: e.polygon?.outlineColor,
+    pointColor: e.point?.color,
+    pointOutlineColor: e.point?.outlineColor,
+    billboardColor: e.billboard?.color,
+  };
+}
+
+function restoreCapturedStyle() {
+  const s = previousSelectedStyleRef.value;
+  if (!s) return;
+  const e = findEntityInDataSource(s.data_source_name, s.id);
+  if (!e) return;
+  if (e.polygon) {
+    e.polygon.material = s.polygonMaterial;
+    e.polygon.outlineColor = s.polygonOutlineColor;
+  }
+  if (e.point) {
+    e.point.color = s.pointColor;
+    e.point.outlineColor = s.pointOutlineColor;
+  }
+  if (e.billboard) {
+    e.billboard.color = s.billboardColor;
+  }
+  previousSelectedStyleRef.value = null;
 }
 
 const onMouseMoveThrottled = throttle(onMouseMove, 50); // 50 ms -> 20 times per second
