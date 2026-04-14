@@ -20,9 +20,15 @@ async function convertFgbArrayBufferToGeoJSON(arrayBuffer: ArrayBuffer) {
 
 async function fetchFgbAsGeoJSON(
   url: string,
-  fetchOptions: RequestInit = {}
+  fetchOptions: RequestInit = {},
+  retries: number = 3 // using default value to ensure backwards compatibility
 ) {
   const resp = await fetch(url, fetchOptions);
+
+  if (resp.status === 503 && retries > 0) {
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    return fetchFgbAsGeoJSON(url, fetchOptions, retries - 1);
+  }
 
   if (!resp.ok) {
     throw new Error(`Failed to fetch FGB from ${url}: ${resp.status} ${resp.statusText}`);
